@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Inspection Call System</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #f0f4f8; margin: 0; padding: 20px; }
+  h1, h2 { color: #333; }
+  .container { max-width: 800px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);}
+  button { background-color: #007BFF; color: white; border: none; padding: 12px 20px; margin: 5px 0; border-radius: 5px; cursor: pointer; font-size: 16px; }
+  button:hover { background-color: #0056b3; }
+  input, select, textarea { width: 100%; padding: 8px; margin: 6px 0 12px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 16px; }
+  label { font-weight: bold; }
+  table { border-collapse: collapse; width: 100%; margin-top: 15px;}
+  th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+  th { background-color: #007BFF; color: white; }
+  .hidden { display: none; }
+  .error { color: red; font-weight: bold; }
+  .nav-buttons { display: flex; flex-direction: column; max-width: 300px; margin: 20px auto; }
+</style>
+</head>
+<body>
+
+<div class="container" id="main-container">
+  <h1>Inspection Call System</h1>
+  <div id="navigation" class="nav-buttons">
+    <button onclick="showPage('raiseInspection')">Raise Inspection Call</button>
+    <button onclick="showPage('psm')">PSM</button>
+    <button onclick="showPage('tkilQA')">TKIL QA</button>
+    <button onclick="showPage('tpiInspector')">TPI Inspector</button>
+    <button onclick="showPage('inspectionResult')">Inspection Result</button>
+  </div>
+
+  <!-- Pages -->
+  <div id="pages">
+
+    <!-- Raise Inspection Call -->
+    <div id="raiseInspection" class="page hidden">
+      <h2>Raise Inspection Call</h2>
+      <form id="raiseInspectionForm">
+        <label>PSM Mail ID:</label>
+        <input type="email" id="psmMail" required />
+        
+        <label>PO Number:</label>
+        <input type="text" id="poNumber" required />
+
+        <label>Date of Sending Call:</label>
+        <input type="date" id="callDate" required />
+
+        <label>Inspection Required On:</label>
+        <input type="date" id="inspectionDate" required />
+
+        <label>Project Code:</label>
+        <input type="text" id="projectCode" required />
+
+        <label>Project Name:</label>
+        <input type="text" id="projectName" required />
+
+        <label>Contact Person Name:</label>
+        <input type="text" id="contactName" required />
+
+        <label>Contact Person Mobile Number:</label>
+        <input type="tel" id="contactMobile" required pattern="[0-9]{10,15}" />
+
+        <label>Vendor Name:</label>
+        <input type="text" id="vendorName" required />
+
+        <label>Place of Inspection:</label>
+        <input type="text" id="inspectionPlace" required />
+
+        <label>Item Description:</label>
+        <textarea id="itemDescription" rows="3" required></textarea>
+
+        <button type="submit">Submit</button>
+      </form>
+      <p id="raiseInspectionMessage"></p>
+    </div>
+
+    <!-- PSM -->
+    <div id="psm" class="page hidden">
+      <h2>PSM Entry</h2>
+      <label>Enter Inspection Call Number:</label>
+      <input type="text" id="psmCallNumber" maxlength="4" />
+      <button onclick="loadPSMForm()">Load Form</button>
+      <div id="psmFormContainer" class="hidden">
+        <form id="psmForm">
+          <label>PSM Contact Person:</label>
+          <input type="text" id="psmContact" readonly />
+
+          <label>QA Engineer Name:</label>
+          <input type="text" id="qaName" required />
+
+          <label>QA Engineer Mail ID:</label>
+          <input type="email" id="qaMail" required />
+
+          <button type="submit">Submit</button>
+        </form>
+        <p id="psmMessage"></p>
+      </div>
+    </div>
+
+    <!-- TKIL QA -->
+    <div id="tkilQA" class="page hidden">
+      <h2>TKIL QA</h2>
+      <label>Enter Inspection Call Number:</label>
+      <input type="text" id="tkilCallNumber" maxlength="4" />
+      <button onclick="loadTkilForm()">Load Form</button>
+      <div id="tkilFormContainer" class="hidden">
+        <form id="tkilForm">
+          <label>Inspection Agency:</label>
+          <select id="inspectionAgency" required>
+            <option value="">--Select--</option>
+            <option value="TUV SUD">TUV SUD</option>
+            <option value="TUV NORD">TUV NORD</option>
+            <option value="TPL">TPL</option>
+            <option value="BV">BV</option>
+            <option value="LRQA">LRQA</option>
+            <option value="Other">Other</option>
+          </select>
+
+          <label>Inspection Agency Mail ID:</label>
+          <input type="email" id="inspectionAgencyMail" required />
+
+          <button type="submit">Submit</button>
+        </form>
+        <p id="tkilMessage"></p>
+      </div>
+    </div>
+
+    <!-- TPI Inspector -->
+    <div id="tpiInspector" class="page hidden">
+      <h2>TPI Inspector</h2>
+      <label>Enter Inspection Call Number:</label>
+      <input type="text" id="tpiCallNumber" maxlength="4" />
+      <button onclick="loadTpiForm()">Load Form</button>
+      <div id="tpiFormContainer" class="hidden">
+        <form id="tpiForm">
+          <label>Inspector Name:</label>
+          <input type="text" id="inspectorName" required />
+
+          <label>Inspection Agency:</label>
+          <input type="text" id="tpiInspectionAgency" required />
+
+          <label>Inspection Start Date and Time:</label>
+          <input type="datetime-local" id="inspectionStart" required />
+
+          <label>Inspection End Date and Time:</label>
+          <input type="datetime-local" id="inspectionEnd" required />
+
+          <label>Inspection Report Number:</label>
+          <input type="text" id="inspectionReportNumber" required />
+
+          <label>Upload Inspection Report (PDF):</label>
+          <input type="file" id="inspectionReportFile" accept="application/pdf" />
+
+          <label>Remarks:</label>
+          <textarea id="remarks" rows="3"></textarea>
+
+          <button type="submit">Submit</button>
+        </form>
+        <p id="tpiMessage"></p>
+      </div>
+    </div>
+
+    <!-- Inspection Result -->
+    <div id="inspectionResult" class="page hidden">
+      <h2>Inspection Result</h2>
+      <div id="resultTableContainer"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // Data storage (simple in-memory)
+  const inspectionData = {};
+
+  // Utility to show only one page at a time
+  function showPage(pageId) {
+    document.querySelectorAll('.page').forEach(page => {
+      page.classList.add('hidden');
+    });
+    document.getElementById(pageId).classList.remove('hidden');
+    clearMessages();
+  }
+
+  function clearMessages() {
+    ['raiseInspectionMessage', 'psmMessage', 'tkilMessage', 'tpiMessage'].forEach(id => {
+      document.getElementById(id).textContent = '';
+    });
+  }
+
+  // Raise Inspection Call form submission
+  document.getElementById('raiseInspectionForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    // Generate unique 4-digit code
+    let id;
+    do {
+      id = Math.floor(1000 + Math.random() * 9000).toString();
+    } while (inspectionData[id]);
+
+    const formData = {
+      psmMail: this.psmMail.value.trim(),
+      poNumber: this.poNumber.value.trim(),
+      callDate: this.callDate.value,
+      inspectionDate: this.inspectionDate.value,
+      projectCode: this.projectCode.value.trim(),
+      projectName: this.projectName.value.trim(),
+      contactName: this.contactName.value.trim(),
+      contactMobile: this.contactMobile.value.trim(),
+      vendorName: this.vendorName.value.trim(),
+      inspectionPlace: this.inspectionPlace.value.trim(),
+      itemDescription: this.itemDescription.value.trim(),
+    };
+
+    inspectionData[id] = { raiseInspection: formData };
+
+    document.getElementById('raiseInspectionMessage').textContent = 
+      `Inspection Call Created! Your Inspection Call Number is: ${id}. A mail would be sent to ${formData.psmMail}. (Note: Email sending is simulated)`;
+
+    this.reset();
+  });
+
+  // PSM form load
+  function loadPSMForm() {
+    const callNum = document.getElementById('psmCallNumber').value.trim();
+    if (!inspectionData[callNum]) {
+      alert('Invalid Inspection Call Number');
+      return;
+    }
+
+    const data = inspectionData[callNum].raiseInspection;
+
+    if (!data) {
+      alert('Raise Inspection form data not found.');
+      return;
+    }
+
+    document.getElementById('psmContact').value = data.contactName;
+    document.getElementById('psmFormContainer').classList.remove('hidden');
+
+    // Clear previous message
+    document.getElementById('psmMessage').textContent = '';
+
+    // Store current call number for submit
+    document.getElementById('psmForm').dataset.callNum = callNum;
+  }
+
+  // PSM form submission
+  document.getElementById('psmForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const callNum = this.dataset.callNum;
+    if (!callNum || !inspectionData[callNum]) {
+      alert('Invalid state.');
+      return;
+    }
+
+    inspectionData[callNum].psm = {
+      psmContact: this.psmContact.value.trim(),
+      qaName: this.qaName.value.trim(),
+      qaMail: this.qaMail.value.trim()
+    };
+
+    document.getElementById('psmMessage').textContent = `PSM data submitted and email would be sent to ${this.qaMail.value.trim()} (Simulated).`;
+    this.reset();
+    this.parentNode.classList.add('hidden');
+    document.getElementById('psmCallNumber').value = '';
+  });
+
+  // TKIL QA form load
+  function loadTkilForm() {
+    const callNum = document.getElementById('tkilCallNumber').value.trim();
+    if (!inspectionData[callNum]) {
+      alert('Invalid Inspection Call Number');
+      return;
+    }
+
+    const data = inspectionData[callNum].raiseInspection;
+
+    if (!data) {
+      alert('Raise Inspection form data not found.');
+      return;
+    }
+
+    // Reset fields
+    document.getElementById('inspectionAgency').value = '';
+    document.getElementById('inspectionAgencyMail').value = '';
+    document.getElementById('tkilFormContainer').classList.remove('hidden');
+
+    document.getElementById('tkilMessage').textContent = '';
+    document.getElementById('tkilForm').dataset.callNum = callNum;
+  }
+
+  // TKIL QA form submission
+  document.getElementById('tkilForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const callNum = this.dataset.callNum;
+    if (!callNum || !inspectionData[callNum]) {
+      alert('Invalid state.');
+      return;
+    }
+
+    inspectionData[callNum].tkilQA = {
+      inspectionAgency: this.inspectionAgency.value,
+      inspectionAgencyMail: this.inspectionAgencyMail.value.trim()
+    };
+
+    document.getElementById('tkilMessage').textContent = `TKIL QA data submitted and email would be sent to ${this.inspectionAgencyMail.value.trim()} (Simulated).`;
+    this.reset();
+    this.parentNode.classList.add('hidden');
+    document.getElementById('tkilCallNumber').value = '';
+  });
+
+  // TPI Inspector form load
+  function loadTpiForm() {
+    const callNum = document.getElementById('tpiCallNumber').value.trim();
+    if (!inspectionData[callNum]) {
+      alert('Invalid Inspection Call Number');
+      return;
+    }
+
+    const data = inspectionData[callNum].raiseInspection;
+
+    if (!data) {
+      alert('Raise Inspection form data not found.');
+      return;
+    }
+
+    // Reset fields
+    document.getElementById('inspectorName').value = '';
+    document.getElementById('tpiInspectionAgency').value = '';
+    document.getElementById('inspectionStart').value = '';
+    document.getElementById('inspectionEnd').value = '';
+    document.getElementById('inspectionReportNumber').value = '';
+    document.getElementById('inspectionReportFile').value = '';
+    document.getElementById('remarks').value = '';
+
+    document.getElementById('tpiFormContainer').classList.remove('hidden');
+    document.getElementById('tpiMessage').textContent = '';
+    document.getElementById('tpiForm').dataset.callNum = callNum;
+  }
+
+  // TPI Inspector form submission
+  document.getElementById('tpiForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const callNum = this.dataset.callNum;
+    if (!callNum || !inspectionData[callNum]) {
+      alert('Invalid state.');
+      return;
+    }
+
+    // For file upload - store just filename (cannot upload in this demo)
+    const fileInput = document.getElementById('inspectionReportFile');
+    const fileName = fileInput.files.length > 0 ? fileInput.files[0].name : 'No file uploaded';
+
+    inspectionData[callNum].tpiInspector = {
+      inspectorName: this.inspectorName.value.trim(),
+      inspectionAgency: this.tpiInspectionAgency.value.trim(),
+      inspectionStart: this.inspectionStart.value,
+      inspectionEnd: this.inspectionEnd.value,
+      inspectionReportNumber: this.inspectionReportNumber.value.trim(),
+      inspectionReportFileName: fileName,
+      remarks: this.remarks.value.trim()
+    };
+
+    // Email would be sent to QA Engineer mail if available
+    const qaMail = inspectionData[callNum].psm?.qaMail || '(No QA Mail found)';
+
+    document.getElementById('tpiMessage').textContent = `TPI Inspector data submitted and email would be sent to ${qaMail} (Simulated).`;
+    this.reset();
+    this.parentNode.classList.add('hidden');
+    document.getElementById('tpiCallNumber').value = '';
+  });
+
+  // Inspection Result display
+  function showInspectionResults() {
+    const container = document.getElementById('resultTableContainer');
+    container.innerHTML = '';
+    if (Object.keys(inspectionData).length === 0) {
+      container.innerHTML = '<p>No inspection data available.</p>';
+      return;
+    }
+
+    let table = '<table><thead><tr>' +
+      '<th>Call Number</th>' +
+      '<th>PSM Mail</th>' +
+      '<th>PO Number</th>' +
+      '<th>Inspection Date</th>' +
+      '<th>Project Code</th>' +
+      '<th>Project Name</th>' +
+      '<th>Contact Person</th>' +
+      '<th>Vendor</th>' +
+      '<th>Place of Inspection</th>' +
+      '<th>Item Description</th>' +
+
+      '<th>PSM Contact</th>' +
+      '<th>QA Engineer Name</th>' +
+
+      '<th>Inspection Agency</th>' +
+      '<th>Inspection Agency Mail</th>' +
+
+      '<th>Inspector Name</th>' +
+      '<th>Inspection Agency (TPI)</th>' +
+      '<th>Inspection Start</th>' +
+      '<th>Inspection End</th>' +
+      '<th>Report Number</th>' +
+      '<th>Report File</th>' +
+      '<th>Remarks</th>' +
+
+      '</tr></thead><tbody>';
+
+    for (const callNum in inspectionData) {
+      const d = inspectionData[callNum];
+      const r = d.raiseInspection || {};
+      const psm = d.psm || {};
+      const tkil = d.tkilQA || {};
+      const tpi = d.tpiInspector || {};
+
+      table += `<tr>
+        <td>${callNum}</td>
+        <td>${r.psmMail || ''}</td>
+        <td>${r.poNumber || ''}</td>
+        <td>${r.inspectionDate || ''}</td>
+        <td>${r.projectCode || ''}</td>
+        <td>${r.projectName || ''}</td>
+        <td>${r.contactName || ''}</td>
+        <td>${r.vendorName || ''}</td>
+        <td>${r.inspectionPlace || ''}</td>
+        <td>${r.itemDescription || ''}</td>
+
+        <td>${psm.psmContact || ''}</td>
+        <td>${psm.qaName || ''}</td>
+
+        <td>${tkil.inspectionAgency || ''}</td>
+        <td>${tkil.inspectionAgencyMail || ''}</td>
+
+        <td>${tpi.inspectorName || ''}</td>
+        <td>${tpi.inspectionAgency || ''}</td>
+        <td>${tpi.inspectionStart || ''}</td>
+        <td>${tpi.inspectionEnd || ''}</td>
+        <td>${tpi.inspectionReportNumber || ''}</td>
+        <td>${tpi.inspectionReportFileName || ''}</td>
+        <td>${tpi.remarks || ''}</td>
+      </tr>`;
+    }
+
+    table += '</tbody></table>';
+    container.innerHTML = table;
+  }
+
+  // Show inspection result table when Inspection Result tab is shown
+  document.querySelector('button[onclick="showPage(\'inspectionResult\')"]').addEventListener('click', function() {
+    showPage('inspectionResult');
+    showInspectionResults();
+  });
+</script>
+
+</body>
+</html>
